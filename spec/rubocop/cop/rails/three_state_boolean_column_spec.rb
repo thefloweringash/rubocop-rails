@@ -82,6 +82,16 @@ RSpec.describe RuboCop::Cop::Rails::ThreeStateBooleanColumn, :config do
       RUBY
     end
 
+    it 'does not register an offense when using a method other than create_table or change_table' do
+      expect_no_offenses(<<~RUBY)
+        def change
+          create_special_thing(:users) do |t|
+            t.column :active, :boolean
+          end
+        end
+      RUBY
+    end
+
     it 'registers an offense when using `#change_column_null` for other table or column' do
       expect_offense(<<~RUBY)
         def change
@@ -122,6 +132,16 @@ RSpec.describe RuboCop::Cop::Rails::ThreeStateBooleanColumn, :config do
             t.boolean :active
           end
           change_column_null :users, :active, false
+        end
+      RUBY
+    end
+
+    it 'does not register an offense when using a method other than create_table or change_table' do
+      expect_no_offenses(<<~RUBY)
+        def change
+          create_special_thing(:users) do |t|
+            t.boolean :active
+          end
         end
       RUBY
     end
